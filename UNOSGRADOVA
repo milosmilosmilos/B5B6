@@ -1,0 +1,190 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Data.OleDb;
+
+namespace WindowsFormsApp1
+{
+    public partial class UnosGradova : Form
+    {
+        public UnosGradova()
+        {
+            InitializeComponent();
+        }
+
+        private void Novi_Click(object sender, EventArgs e)
+        {
+            textBox1.Clear();
+            textBox2.Clear();
+            textBox3.Clear();
+            textBox4.Clear();
+            textBox5.Clear();
+            textBox1.Focus();
+        }
+
+        private void Upisi_Click(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B5B6.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = string.Format("INSERT INTO Grad VALUES({0},'{1}',{2},{3},{4})", Convert.ToInt32(textBox1.Text), textBox2.Text, Convert.ToInt32(textBox3.Text), Convert.ToInt32(textBox4.Text), Convert.ToInt32(textBox5.Text));
+            try
+            {
+                con.Open();
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Uspesno ste dodali grad");
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                con.Close();
+                UnosGradova f = new UnosGradova();
+                f.Show();
+                this.Close();
+            }
+        }
+
+        private void Izadji_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void Prethodni_Click(object sender, EventArgs e)
+        {
+            int sifra;
+            if (String.Compare(textBox1.Text, "") == 0) sifra = 0;
+            else sifra = Convert.ToInt32(textBox1.Text);
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B5B6.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT * FROM Grad ORDER BY GradID asc";
+            try
+            {
+                con.Open();
+                using(OleDbDataReader reader = cmd.ExecuteReader())
+                {
+                    if (sifra != 0)
+                    {
+                        reader.Read();
+                        while (Convert.ToInt32(reader["GradID"]) < sifra-1) reader.Read();
+                        textBox1.Text = reader["GradID"].ToString();
+                        textBox2.Text = reader["Grad"].ToString();
+                        textBox3.Text = reader["PozivniBroj"].ToString();
+                        textBox4.Text = reader["PostanskiBroj"].ToString();
+                        textBox5.Text = reader["BrojStanovnika"].ToString();
+                    }
+                    if (sifra == 0)//prvi slog
+                    {
+                        reader.Read();
+                        textBox1.Text = reader["GradID"].ToString();
+                        textBox2.Text = reader["Grad"].ToString();
+                        textBox3.Text = reader["PozivniBroj"].ToString();
+                        textBox4.Text = reader["PostanskiBroj"].ToString();
+                        textBox5.Text = reader["BrojStanovnika"].ToString();
+                    }
+
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+
+        private void Sledeci_Click(object sender, EventArgs e)
+        {
+            int sifra;
+            if (String.Compare(textBox1.Text, "") == 0) sifra = 0;
+            else sifra = Convert.ToInt32(textBox1.Text);
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B5B6.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT * FROM Grad ORDER BY GradID asc";
+            try
+            {
+                con.Open();
+                using (OleDbDataReader reader = cmd.ExecuteReader())
+                { 
+                    if (sifra == 0)
+                    {
+                        while (reader.Read()) ;
+                        textBox1.Text = reader["GradID"].ToString();
+                        textBox2.Text = reader["Grad"].ToString();
+                        textBox3.Text = reader["PozivniBroj"].ToString();
+                        textBox4.Text = reader["PostanskiBroj"].ToString();
+                        textBox5.Text = reader["BrojStanovnika"].ToString();
+                    }
+                    else
+                    {
+                        reader.Read();
+                        while (Convert.ToInt32(reader["GradID"]) < sifra + 1) reader.Read();
+                        textBox1.Text = reader["GradID"].ToString();
+                        textBox2.Text = reader["Grad"].ToString();
+                        textBox3.Text = reader["PozivniBroj"].ToString();
+                        textBox4.Text = reader["PostanskiBroj"].ToString();
+                        textBox5.Text = reader["BrojStanovnika"].ToString();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+
+        private void UnosGradova_Load(object sender, EventArgs e)
+        {
+            OleDbConnection con = new OleDbConnection();
+            con.ConnectionString = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source=B5B6.accdb";
+            OleDbCommand cmd = new OleDbCommand();
+            cmd.Connection = con;
+            cmd.CommandText = "SELECT * FROM Grad ORDER BY GradID asc";
+            try
+            {
+                con.Open();
+                using (OleDbDataReader reader = cmd.ExecuteReader())
+                {
+                    reader.Read();
+                    textBox1.Text = reader["GradID"].ToString();
+                    textBox2.Text = reader["Grad"].ToString();
+                    textBox3.Text = reader["PozivniBroj"].ToString();
+                    textBox4.Text = reader["PostanskiBroj"].ToString();
+                    textBox5.Text = reader["BrojStanovnika"].ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+    }
+}
